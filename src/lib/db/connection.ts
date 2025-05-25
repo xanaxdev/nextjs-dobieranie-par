@@ -15,3 +15,9 @@ export const AppDataSource = new DataSource({
   logging: false,
   entities: [User, Answer, Match],
 });
+
+export async function connectDB() {
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
+  }
+}
