@@ -12,14 +12,21 @@ export default function PairsPage() {
   const [finalized, setFinalized] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const fetchPairs = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/match");
+      const data = await res.json();
+      setPairs(data.pairs || []);
+      setFinalized(data.finalized || false);
+    } catch (err) {
+      console.error("Błąd ładowania par:", err);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetch("/api/match")
-      .then((res) => res.json())
-      .then((data) => {
-        setPairs(data.pairs || []);
-        setFinalized(data.finalized || false);
-        setLoading(false);
-      });
+    fetchPairs();
   }, []);
 
   if (loading) {
@@ -32,9 +39,15 @@ export default function PairsPage() {
         <h1 className="text-2xl font-semibold text-gray-700 mb-2">
           Dobieranie par trwa
         </h1>
-        <p className="text-gray-500">
+        <p className="text-gray-500 mb-4">
           Pary będą widoczne, gdy losowanie zostanie zakończone.
         </p>
+        <button
+          onClick={fetchPairs}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Odśwież
+        </button>
       </div>
     );
   }
@@ -44,6 +57,15 @@ export default function PairsPage() {
       <h1 className="text-3xl font-bold text-center mb-8">
         Aktualne dopasowania
       </h1>
+
+      <div className="flex justify-end mb-6">
+        <button
+          onClick={fetchPairs}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          🔄 Odśwież dane
+        </button>
+      </div>
 
       {pairs.length === 0 ? (
         <p className="text-center text-gray-500">Brak sparowanych osób.</p>
@@ -57,7 +79,6 @@ export default function PairsPage() {
               <span className="text-lg font-medium text-gray-800">
                 {pair.users.join(" 🤝 ")}
               </span>
-              <span className="text-sm text-gray-500">{pair.score}%</span>
             </div>
           ))}
         </div>
