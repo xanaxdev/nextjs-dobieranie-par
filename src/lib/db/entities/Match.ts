@@ -6,20 +6,19 @@ import {
   JoinColumn,
   CreateDateColumn,
 } from "typeorm";
-import { User } from "./User";
 
 @Entity()
 export class Match {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToOne(() => User)
+  @OneToOne("User")
   @JoinColumn()
-  userA!: User;
+  userA!: any;
 
-  @OneToOne(() => User)
+  @OneToOne("User")
   @JoinColumn()
-  userB!: User;
+  userB!: any;
 
   @Column()
   compatibilityScore!: number;

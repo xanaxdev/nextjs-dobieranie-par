@@ -1,13 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { User } from "./User";
 
 @Entity()
 export class Answer {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => User, (user) => user.answers, { onDelete: "CASCADE" })
-  user!: User;
+  @ManyToOne("User", "answers", { onDelete: "CASCADE" })
+  user!: any; // lub: user!: User jeśli naprawdę chcesz silne typowanie
 
   @Column()
   questionId!: number;
