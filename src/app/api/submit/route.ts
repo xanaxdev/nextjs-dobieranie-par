@@ -1,25 +1,37 @@
 import { NextResponse } from "next/server";
-import { AppDataSource } from "@/lib/db/connection";
+import { AppDataSource, connectDB } from "@/lib/db/connection";
 import { User } from "@/lib/db/entities/User";
 import { Answer } from "@/lib/db/entities/Answer";
-import { connectDB } from "@/lib/db/connection";
 import { matchUsers } from "@/services/matchUsers";
+
+type IncomingAnswer = {
+  questionId: number;
+  value: string;
+};
 
 export async function POST(req: Request) {
   try {
     await connectDB();
     const data = await req.json();
-
     const { name, answers } = data;
 
     if (!name || !answers || !Array.isArray(answers)) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    // 1. Zapisz użytkownika
     const userRepo = AppDataSource.getRepository(User);
     const answerRepo = AppDataSource.getRepository(Answer);
 
+    // ❗Sprawdź, czy imię już istnieje
+    const existing = await userRepo.findOne({ where: { name } });
+    if (existing) {
+      return NextResponse.json(
+        { error: "Imię już istnieje — wybierz inne." },
+        { status: 409 }
+      );
+    }
+
+    // 1. Zapisz użytkownika
     const user = await userRepo.save({ name });
 
     // 2. Zapisz odpowiedzi
@@ -32,7 +44,7 @@ export async function POST(req: Request) {
     );
     await answerRepo.save(savedAnswers);
 
-    // 3. Przelicz wszystkie dopasowania
+    // 3. Przelicz dopasowania
     await matchUsers();
 
     return NextResponse.json({ success: true });

@@ -15,7 +15,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ unique: true })
   name!: string;
 
   @OneToMany(() => Answer, (answer) => answer.user, { cascade: true })
