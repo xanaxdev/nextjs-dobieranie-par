@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { AppDataSource } from "@/lib/db/connection";
 import { User } from "@/lib/db/entities/User";
 import { Answer } from "@/lib/db/entities/Answer";
-import { Match } from "@/lib/db/entities/Match";
 import { connectDB } from "@/lib/db/connection";
 import { matchUsers } from "@/services/matchUsers";
 
@@ -20,12 +19,11 @@ export async function POST(req: Request) {
     // 1. Zapisz użytkownika
     const userRepo = AppDataSource.getRepository(User);
     const answerRepo = AppDataSource.getRepository(Answer);
-    const matchRepo = AppDataSource.getRepository(Match);
 
     const user = await userRepo.save({ name });
 
     // 2. Zapisz odpowiedzi
-    const savedAnswers = answers.map((a: any) =>
+    const savedAnswers = (answers as IncomingAnswer[]).map((a) =>
       answerRepo.create({
         user,
         questionId: a.questionId,

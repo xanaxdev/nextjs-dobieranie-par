@@ -1,4 +1,11 @@
-export const questions = [
+export type Question = {
+  id: number;
+  question: string;
+  type: "single" | "multiple" | "text";
+  options?: string[];
+};
+
+export const questions: Question[] = [
   {
     id: 1,
     question: "Jaki jest Twój ulubiony kolor?",

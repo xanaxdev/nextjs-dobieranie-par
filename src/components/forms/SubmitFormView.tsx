@@ -2,6 +2,29 @@
 
 import Link from "next/link";
 
+type Question = {
+  id: number;
+  question: string;
+  type: "single" | "multiple" | "text";
+  options?: string[];
+};
+
+type SubmitFormViewProps = {
+  name: string;
+  setName: (val: string) => void;
+  nameTaken: boolean;
+  suggestedName: string | null;
+  answers: Record<number, string | string[]>;
+  currentQuestion: Question | null;
+  handleChange: (id: number, val: string | string[]) => void;
+  handleSubmit: () => void;
+  goNext: () => void;
+  step: number;
+  submitted: boolean;
+  isSubmitting: boolean;
+  questions: Question[];
+};
+
 export default function SubmitFormView({
   name,
   setName,
@@ -16,7 +39,7 @@ export default function SubmitFormView({
   submitted,
   isSubmitting,
   questions,
-}: any) {
+}: SubmitFormViewProps) {
   if (submitted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
@@ -72,7 +95,7 @@ export default function SubmitFormView({
           </p>
 
           {currentQuestion.type === "single" &&
-            currentQuestion.options.map((opt: string) => (
+            currentQuestion.options?.map((opt) => (
               <label key={opt} className="block mb-2">
                 <input
                   type="radio"
@@ -86,16 +109,19 @@ export default function SubmitFormView({
             ))}
 
           {currentQuestion.type === "multiple" &&
-            currentQuestion.options.map((opt: string) => (
+            currentQuestion.options?.map((opt) => (
               <label key={opt} className="block mb-2">
                 <input
                   type="checkbox"
-                  checked={answers[currentQuestion.id]?.includes(opt)}
+                  checked={(answers[currentQuestion.id] as string[])?.includes(
+                    opt
+                  )}
                   onChange={(e) => {
-                    const prev = answers[currentQuestion.id] || [];
+                    const prev =
+                      (answers[currentQuestion.id] as string[]) || [];
                     const updated = e.target.checked
                       ? [...prev, opt]
-                      : prev.filter((v: string) => v !== opt);
+                      : prev.filter((v) => v !== opt);
                     handleChange(currentQuestion.id, updated);
                   }}
                   className="mr-2"
@@ -122,7 +148,7 @@ export default function SubmitFormView({
         </>
       )}
 
-      {/* Podsumowanie i przycisk wysyłania */}
+      {/* Podsumowanie */}
       {step > questions.length && (
         <>
           <p className="text-lg font-semibold mb-4">Wszystko gotowe!</p>
