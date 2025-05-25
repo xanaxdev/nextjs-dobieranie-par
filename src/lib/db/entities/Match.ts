@@ -20,6 +20,13 @@ export class Match {
   @JoinColumn()
   userB!: any;
 
+  @OneToOne("User")
+  @JoinColumn()
+  userC?: any;
+
+  @Column({ default: false })
+  isFinalized!: boolean;
+
   @Column()
   compatibilityScore!: number;
 
